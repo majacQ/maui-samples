@@ -4,6 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
+  <<<<<<< workload-install
             "label": "Build",
             "type": "shell",
             "command": "dotnet build ${input:project} -t:${input:target} -p:Configuration=${input:configuration}",
@@ -85,4 +86,11 @@
             ]
         },
       ]
+  =======
+            "label": "Debug HelloAndroid",
+            "type": "shell",
+            "command": "dotnet build HelloAndroid/HelloAndroid.csproj -t:Install,_Run -p:AndroidAttachDebugger=true"
+        },
+    ]
+  >>>>>>> vscode-configuration
 }
