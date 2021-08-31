@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+  <<<<<<< davidortinau/calculator
     <TargetFramework>net6.0-android</TargetFramework>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
@@ -9,3 +10,12 @@
     <PackageReference Include="Xamarin.AndroidX.Arch.Core.Runtime" Version="2.1.0.8-net6preview01" />
   </ItemGroup>
 </Project>
+  =======
+    <TargetFramework>netcoreapp5.0</TargetFramework>
+    <Configuration>Debug</Configuration>
+    <RuntimeIdentifier>android.21-arm64</RuntimeIdentifier>
+    
+    <AndroidRestoreOnBuild>True</AndroidRestoreOnBuild>
+  </PropertyGroup>
+</Project>
+  >>>>>>> android-restore-on-build
