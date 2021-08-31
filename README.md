@@ -1,92 +1,162 @@
-# net6-samples
+# .NET 6 Client App Samples for Android, iOS, macOS, and Windows
 
-_This is an *early* preview of Xamarin in .NET 6 **not for production use**. Expect breaking changes as Xamarin is still in development for .NET 6._
+_These apps are based on previews of Mobile (iOS/Android) and Desktop (macOS/Windows) in .NET 6 which are **not for production use**. Expect breaking changes as this is still in development for .NET 6._
 
-First install the [latest master build of .NET 6][0].
+## Installing with .NET MAUI Check Tool
 
-Projects:
+This is a community supported, open source, global dotnet tool intended to help evaluation your development environment and help you install / configure everything you need to build a .NET MAUI application.
 
-* HelloAndroid - a native Xamarin.Android application
-* HelloiOS - a native Xamarin.iOS application
-* HelloForms, HelloForms.iOS, HelloForms.Android - a cross-platform Xamarin.Forms application
+Install: `dotnet tool update -g redth.net.maui.check --version 0.7.3`
+
+Run: `maui-check`
+
+This will evaluate your environment and in most cases optionally install / configure missing components for you, such as:
+
+* OpenJDK / Android SDK
+* .NET 6 Preview SDK
+* .NET MAUI / iOS / Android workloads
+* Currently does not install SDKs for WinUI3 (Install UWP Workload from Visual Studio 2022)
+
+For more information and source code, visit [redth/dotnet-maui-check](https://github.com/redth/dotnet-maui-check)
+
+## .NET 6 Preview Installers
+
+Download the .NET 6 SDK at:
+
+https://dotnet.microsoft.com/download/dotnet/6.0
+
+_NOTE: newer builds of .NET *may* work, but your mileage may vary.
+You can find the full list of builds at the [dotnet/installer][dotnet/installer] repo._
+
+## `dotnet workload install` Command
+
+A new `dotnet workload install` command is available for installing
+the mobile workloads.
+
+On Windows, in an Administrator command prompt:
+
+    > dotnet workload install maui
+
+On macOS, you'd need to use `sudo`:
+
+    $ sudo dotnet workload install maui
+
+The workload ID for each platform is:
+
+* `maui`
+* `maui-android`
+* `maui-ios`
+* `maui-maccatalyst`
+* `maui-windows`
+* `android`
+* `ios`
+* `maccatalyst`
+* `macos`
+* `tvos`
+
+> NOTE: using `maui-check` is the preferred method for installing
+> workloads, because it will check your system for other software.
+
+## Projects
+
+* HelloMaui - a multi-targeted .NET MAUI Single Project for iOS and Android
+* HelloAndroid - a native Android application
+* HelloiOS - a native iOS application
+* HelloMacCatalyst - a native Mac Catalyst application
+* HelloWinUI3 - .NET MAUI WinUI3 application. WinUI3 requires build and deploy with the latest preview of Visual Studio 2022 17.0.
+
+[dotnet/installer]: https://github.com/dotnet/installer#installers-and-binaries
 
 ## Android
 
 Prerequisites:
 
-* You will need the Android SDK installed as well as `Android SDK Platform 29`. Simplest way to get this is to install the current Xamarin workload and go to `Tools > Android > Android SDK Manager` from within Visual Studio.
+* Starting in .NET 6 Preview 4, [Microsoft OpenJDK 11](https://www.microsoft.com/openjdk) is recommended.
+* You will need the Android SDK installed as well as `Android SDK Platform 30`. Simplest way to get this is to install the current Xamarin workload and go to `Tools > Android > Android SDK Manager` from within Visual Studio.
 
 For example, to build the Android project:
 
-    dotnet build HelloAndroid/HelloAndroid.csproj
+    dotnet build HelloAndroid
 
-You can launch the Android project to an attached emulator via:
+You can launch the Android project to an attached emulator or device via:
 
-    dotnet build HelloAndroid/HelloAndroid.csproj -t:Run
-
-To deploy and run on a device, you can either modify `$(RuntimeIdentifier)` in
-the `.csproj` or run:
-
-    dotnet build HelloAndroid/HelloAndroid.csproj -t:Run -r android.21-arm64
+    dotnet build HelloAndroid -t:Run
 
 ## iOS
 
 Prerequisites:
 
-* Xcode 11.4. Earlier versions won't work.
+* Xcode 13.0 beta 2. Earlier versions won't work.
 
 To build the iOS project:
 
-    dotnet build HelloiOS/HelloiOS.csproj
+    dotnet build HelloiOS
 
 To launch the iOS project on a simulator:
 
-    dotnet build HelloiOS/HelloiOS.csproj -t:Run
+    dotnet build HelloiOS -t:Run
 
-[0]: https://github.com/dotnet/installer#installers-and-binaries
+## WinUI3
 
-## Known Issues
+Currently WinUI3 requires build and deploy. You will need to open the HelloWinUI3.sln with the latest preview of Visual Studio 2022 17.0.
 
-Currently...
+* Windows: [Get started with Project Reunion](https://docs.microsoft.com/en-us/windows/apps/project-reunion/get-started-with-project-reunion#set-up-your-development-environment)
 
-* There is not a way to do `dotnet publish` with multiple RIDs.
-* There is not a way to setup a binding project, neither for Xamarin.Android nor Xamarin.iOS.
-* `System.Console.WriteLine` does not work on Xamarin.Android. Use
-  `Android.Util.Log.Debug` for now.
-* Building for device doesn't work for iOS.
-* Building for tvOS or watchOS does not work.
+* Install the following Preview VSIX. .NET MAUI currently only works with 0.8+ Stable.
+  - https://marketplace.visualstudio.com/items?itemName=ProjectReunion.MicrosoftSingleProjectMSIXPackagingToolsDev17
 
-## Workarounds
+## .NET MAUI
 
-These are notes for things we had to workaround for these samples to work.
+To launch the .NET MAUI project, you will need to specify a `$(TargetFramework)` via the `-f` switch:
 
-### NuGet
+    dotnet build HelloMaui -t:Run -f net6.0-android
+    dotnet build HelloMaui -t:Run -f net6.0-ios
+    dotnet build HelloMaui -t:Run -f net6.0-maccatalyst
 
-Currently, NuGet is not able to restore existing Xamarin.Android/iOS
-packages for a .NET 6 project. We tried `$(AssetTargetFallback)`,
-however, this option does not work in combination with transitive
-dependencies. The `Xamarin.AndroidX.*` set of NuGet packages has a
-complex dependency tree.
+## Using IDEs
 
-Additionally, we had some problems with the Xamarin.Forms NuGet
-package listing the same assembly in both:
+IDE integration into Visual Studio, Visual Studio for Mac, and Visual Studio Code are a work in progress. 
 
-* `lib\netstandard2.0\Xamarin.Forms.Platform.dll`
-* `lib\MonoAndroid10.0\Xamarin.Forms.Platform.dll`
+### Visual Studio
 
-For now we added workarounds in `xamarin-android`, see
-[xamarin-android#4663](https://github.com/xamarin/xamarin-android/pull/4663).
+Currently, you can use Visual Studio 2022 17.0 on Windows (with the
+Xamarin workload installed). .NET 6 Preview 6 requires MSBuild 17.0,
+so .NET 6 projects will not be able to load in older versions of
+Visual Studio.
 
-## Contributing
+### Visual Studio for Mac
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit [https://cla.opensource.microsoft.com](https://cla.opensource.microsoft.com).
+Visual Studio for Mac is not supported at this time, but will be coming in a future release.
 
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+### iOS from Visual Studio
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+To build and debug .NET 6 iOS applications from Visual Studio 2019 you must manually install the .NET 6 SDK and iOS workloads on both **Windows and macOS** (Mac build host).
+
+If while connecting Visual Studio to your Mac through XMA you are prompted to install a different version of the SDK, you can ignore that since it refers to the legacy one.
+
+> Note: currently only the iOS simulator is supported (not the remote simulator).
+
+### Mac Catalyst from Visual Studio for Mac
+
+Running and debugging apps from Visual Studio for Mac is not supported at this time..
+
+### Known Issues - Visual Studio & Visual Studio for Mac
+
+* There are no project property pages available for both iOS and Android
+* Editors (i.e. Manifest editor, Entitlements editor, etc.) will fail to open, so as a workaround please open those files with the XML editor.
+
+### Visual Studio Code
+
+Support has been added to allow debugging of **Android** based apps in Visual Studio Code. Open the `net6-mobile-samples.code-workspace` in Visual Studio Code.
+
+    > code net6-mobile-samples.code-workspace
+
+To build your application use open the Command Pallette and select `Run Build Task`. Select `Build` and then the `Target` you want to run. Available targets are:
+
+* `Build` : Builds the Project.
+* `Install` : Installs the Application on a Device or Emulator.
+* `Clean` : Clean the Project.
+
+You can then select the `Project` and then the `Configuration` (`Debug` or `Release`) you want to `Build`.
+
+To Debug goto the `Run` Tab and make sure `Debug` is selected. Click the Run button. You will be prompted on which project you wish to run, then asked which `TargetFramework` you want to target. For now only `net6.0-android` is supported. You will then be asked if you want to attach the debugger. Finally you will be asked which configuration you wish to use `Debug` or `Release`. After this the application should deploy and run, breakpoints should behave as normal.

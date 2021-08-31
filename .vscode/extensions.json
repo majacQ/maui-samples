@@ -1,6 +1,11 @@
 {
     "recommendations": [
       "ms-dotnettools.csharp",
+  <<<<<<< workload-install
+      "ms-vscode.mono-debug",
+      "visualstudioexptteam.vscodeintellicode",
+  =======
       "ms-vscode.mono-debug"
+  >>>>>>> vscode-configuration
     ]
 }

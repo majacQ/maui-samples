@@ -5,12 +5,29 @@
     "version": "0.2.0",
     "configurations": [
         {
+  <<<<<<< workload-install
+			"name": "Comet",
+			"type": "comet",
+			"request": "launch",
+			"preLaunchTask": "comet: Run"
+		},
+        {
+            "name": "Debug",
+  =======
             "name": "Debug HelloAndroid",
+  >>>>>>> vscode-configuration
             "type": "mono",
             "request": "attach",
             "address": "localhost",
             "port": 10000,
+  <<<<<<< workload-install
+            "preLaunchTask": "Run"
+        }
+    ]
+}
+  =======
             "preLaunchTask": "Debug HelloAndroid",
         }
     ]
 }
+  >>>>>>> vscode-configuration

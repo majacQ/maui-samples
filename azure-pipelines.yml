@@ -2,17 +2,21 @@
 
 trigger:
 - main
+- develop
 
 pr:
 - main
+- develop
 
 variables:
-  DotNetVersion: 5.0.100-preview.7.20307.3
+  IsRunningOnCI: true
+  DotNetVersion: 6.0.100-preview.7.21379.14
+  DotNet.Cli.Telemetry.OptOut: true
 
 jobs:
 - job: windows
   pool:
-    name: Hosted Windows 2019 with VS2019
+    vmImage: windows-latest
   variables:
     LogDirectory: $(Build.ArtifactStagingDirectory)\logs
   steps:
@@ -24,13 +28,26 @@ jobs:
       displayName: install .NET $(DotNetVersion)
       errorActionPreference: stop
 
+    - powershell: dotnet workload install maui --verbosity diag
+      displayName: install optional workloads
+
     - powershell: |
-        & dotnet build HelloAndroid\HelloAndroid.csproj -c Debug -bl:$(LogDirectory)\Debug-HelloAndroid.binlog
-        & dotnet build HelloAndroid\HelloAndroid.csproj -c Release -bl:$(LogDirectory)\Release-HelloAndroid.binlog
-        & dotnet build HelloForms.Android\HelloForms.Android.csproj -c Debug -bl:$(LogDirectory)\Debug-HelloForms.binlog
-        & dotnet build HelloForms.Android\HelloForms.Android.csproj -c Release -bl:$(LogDirectory)\Release-HelloForms.binlog
+        & dotnet build net6-samples.sln -c Debug   -bl:$(LogDirectory)\Debug.binlog
+        & dotnet build net6-samples.sln -c Release -bl:$(LogDirectory)\Release.binlog
       displayName: build samples
       errorActionPreference: stop
+
+    - task: MSBuild@1
+      inputs:
+        solution: HelloMauiWinUI3/HelloMauiWinUI3.sln
+        msbuildArguments: -restore -p:Configuration=Debug -bl:$(Build.ArtifactStagingDirectory)\logs\WinUI3-Debug.binlog
+      displayName: build WinUI3 Debug
+
+    - task: MSBuild@1
+      inputs:
+        solution: HelloMauiWinUI3/HelloMauiWinUI3.sln
+        msbuildArguments: -p:Configuration=Release -bl:$(LogDirectory)\WinUI3-Release.binlog
+      displayName: build WinUI3 Release
 
     - task: CopyFiles@2
       displayName: copy artifacts
@@ -48,22 +65,54 @@ jobs:
       condition: always()
 
 - job: mac
+  timeoutInMinutes: 120
   pool:
-    name: Hosted macOS
+    vmImage: macOS-latest
   variables:
-    LogDirectory: $(Build.ArtifactStagingDirectory)/logs
+    - name: LogDirectory
+      value: $(Build.ArtifactStagingDirectory)/logs
+    - name: DotNet.Root
+      value: /usr/local/share/dotnet/
+    - name: DotNet.Tools
+      value: ~/.dotnet/tools
   steps:
+    - task: UseDotNet@2
+      displayName: install .NET 5
+      inputs:
+        version: 5.x
+        installationPath: $(DotNet.Root)
+
     - bash: >
-        curl -L https://dot.net/v1/dotnet-install.sh > dotnet-install.sh &&
-        sh dotnet-install.sh --version $(DotNetVersion) --install-dir ~/.dotnet/ --verbose &&
-        dotnet --list-sdks
+        export PATH="$(DotNet.Root):$(DotNet.Tools):$PATH" &&
+        curl -L https://raw.githubusercontent.com/dotnet/install-scripts/7a9d5dcab92cf131fc2d8977052f8c2c2d540e22/src/dotnet-install.sh > dotnet-install.sh &&
+        sh dotnet-install.sh --version $(DotNetVersion) --install-dir $DOTNET_ROOT --verbose &&
+        dotnet --list-sdks &&
+        echo "##vso[task.setvariable variable=PATH]$PATH"
       displayName: install .NET $(DotNetVersion)
 
+    - bash: dotnet workload install maui --verbosity diag
+      displayName: install optional workloads
+
+    - bash: sudo xcode-select -s /Applications/Xcode_12.4.app
+      displayName: select Xcode 12.4
+
     - bash: |
-        # Re-enable if Xcode 11.4.1 available or issue fixed: https://github.com/xamarin/xamarin-macios/issues/8325
-        # dotnet build net5-samples.sln -c Debug -bl:$(LogDirectory)/Debug.binlog &&
-        dotnet build net5-samples.sln -c Release -bl:$(LogDirectory)/Release.binlog
+        set -x
+        mkdir -p ~/Library/Preferences/Xamarin
+        rm -f ~/Library/Preferences/Xamarin/Settings.plist
+        /usr/libexec/PlistBuddy -c "add :AppleSdkRoot string $(dirname $(dirname $(xcode-select -p)))" ~/Library/Preferences/Xamarin/Settings.plist || true
+        cat ~/Library/Preferences/Xamarin/Settings.plist || true
+      displayName: configure vsmac xcode
+
+    - bash: |
+        dotnet build net6-samples.sln -c Debug   -bl:$(LogDirectory)/Debug.binlog &&
+        dotnet build net6-samples.sln -c Release -bl:$(LogDirectory)/Release.binlog
       displayName: build samples
+
+    - bash: |
+        dotnet build vs/net6-samples-mac.sln -c Debug   -bl:$(LogDirectory)/Debug-Mac.binlog &&
+        dotnet build vs/net6-samples-mac.sln -c Release -bl:$(LogDirectory)/Release-Mac.binlog
+      displayName: build macOS-only samples
 
     - task: CopyFiles@2
       displayName: copy artifacts
@@ -71,6 +120,7 @@ jobs:
         contents: |
           *Android/**/*-Signed.apk
           *iOS/**/*.app/**
+          *Mac*/**/*.app/**
         targetFolder: $(Build.ArtifactStagingDirectory)
         overWrite: true
       condition: always()
