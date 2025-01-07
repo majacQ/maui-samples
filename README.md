@@ -10,21 +10,22 @@ Official samples can be accessed via the [Samples browser](https://docs.microsof
 
 Sample highlights include:
 
-* [Weather '21 App](6.0/Apps/WeatherTwentyOne)
-* [Calculator App](6.0/Apps/Calculator)
+* [.NET eShop Reference Application - "Northern Mountains"](https://github.com/dotnet/eShop)
+* [Point of Sale](8.0/Apps/PointOfSale)
+* [Weather '21 App](8.0/Apps/WeatherTwentyOne)
+* [Calculator App](8.0/Apps/Calculator)
 * [.NET Podcasts App](https://github.com/microsoft/dotnet-podcasts)
-* [Navigation Samples](6.0/Navigation)
-* [Beginner's Series Task App Sample](6.0/Beginners-Series)
+* [Navigation Samples](8.0/Navigation)
+* [Beginner's Series Task App Sample](8.0/Beginners-Series)
 
 ## Community Samples
 
-* [Rachel's Recipes App](https://github.com/rachelkang/recipeSearch)
+* [.NET MAUI Showcase](https://github.com/jsuarezruiz/dotnet-maui-showcase)
 * [Awesome .NET MAUI](https://github.com/jsuarezruiz/awesome-dotnet-maui)
-* [.NET MAUI samples (.NET MAUI Paint, .NET MAUI Blazor Photo gallery, Kanban board and more)](https://github.com/VladislavAntonyuk/MauiSamples)
 
 ## .NET MAUI Links
 
-* [.NET MAUI Website](https://dot.net/maui)
+* [.NET MAUI Website](https://dotnet.microsoft.com/apps/maui)
 * [.NET MAUI Documentation](https://docs.microsoft.com/dotnet/maui)
 * [.NET MAUI Blog](https://devblogs.microsoft.com/dotnet/category/maui/)
 * [.NET MAUI GitHub](https://github.com/dotnet/maui)
